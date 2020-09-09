@@ -1,31 +1,45 @@
 package pageobjects;
 
-import net.serenitybdd.core.pages.PageObject;
-import net.serenitybdd.core.pages.WebElementFacade;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
+import static java.time.Duration.ofSeconds;
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.xpath;
+import static org.openqa.selenium.support.PageFactory.initElements;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
-public class WeatherPage extends PageObject {
+public class WeatherPage {
 
-
+    @FindBy(xpath = "//input[@id='LocationSearch_input']")
+    WebElement search;
     @FindBy(xpath = "//div[@id='LocationSearch_listbox']/button")
-    List<WebElementFacade> cities;
+    List<WebElement> cities;
+
+    private WebDriver driver;
+    private WebDriverWait wait;
 
     public WeatherPage(WebDriver driver) {
-        super(driver);
+        this.driver = driver;
+        initElements(driver, this);
+        wait = new WebDriverWait(driver, ofSeconds(5));
     }
 
     public void checkCorrectSiteIsOpened(String site) {
-        assertEquals(getDriver().getCurrentUrl(), site);
+        assertEquals(driver.getCurrentUrl(), site);
     }
 
     public void enterCityToSearch(String city) {
-        assertEquals(getDriver().getCurrentUrl(), "https://www.google.com");
+        wait.until(elementToBeClickable(search));
+        wait.until(visibilityOf(search));
+        search.sendKeys(city);
     }
 
     public void checkDropdownWithSuggestionsIsPresent() {
@@ -37,6 +51,6 @@ public class WeatherPage extends PageObject {
     }
 
     public void checkWeatherIsPresentForChosenCity(String city) {
-        find(xpath("//section[contains(@aria-label,'Current Conditions for " + city + "]"));
+        driver.findElement(xpath("//section[contains(@aria-label,'Current Conditions for " + city + "')]"));
     }
 }

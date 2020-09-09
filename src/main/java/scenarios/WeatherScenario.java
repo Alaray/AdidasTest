@@ -1,59 +1,70 @@
 package scenarios;
 
+
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import net.thucydides.core.annotations.Steps;
-import stepsdefinition.BrowserSetupSteps;
-import stepsdefinition.WeatherSteps;
+import pageobjects.SearchPage;
+import pageobjects.WeatherPage;
 
-public class WeatherScenario {
+public class WeatherScenario extends BrowserSetup{
 
-    @Steps
-    BrowserSetupSteps browserSetupSteps;
+    private SearchPage searchPage;
+    private WeatherPage weatherPage;
 
-    @Steps
-    WeatherSteps weatherSteps;
-
-
-    @Given("Any Browser is Opened")
-    public void isBrowserOpened() {
-        browserSetupSteps.checkBrowserIsOpened();
+    @Before
+    public void initPOs() {
+        setDriver();
+        this.searchPage = new SearchPage(driver);
+        this.weatherPage = new WeatherPage(driver);
     }
 
-    @When("I search for {string}")
+    @Given("I am at google search")
+    public void navigateToSearch() {
+        searchPage.navigateToSearch();
+    }
+
+    @When("^I search for \"([^\"]*)\"$")
     public void searchFor(String searchTerm) {
-        weatherSteps.searchFor(searchTerm);
+        searchPage.searchFor(searchTerm);
     }
 
     @And("Click on correct site in search results")
     public void clickCorrectSite(){
-        weatherSteps.clickOnCorrectSite();
+        searchPage.clickOnCorrectSite();
     }
 
-    @Then("Correct site {string} is opened")
+    @Then("^Site \"([^\"]*)\" is opened$")
     public void checkCorrectSiteIsOpened(String site) {
-        weatherSteps.checkCorrectSiteIsOpened(site);
+        weatherPage.checkCorrectSiteIsOpened(site);
     }
 
-    @When("{string} city entered in search")
+    @When("^\"(.+)\" city entered in search$")
     public void enterCityToSearch(String city) {
-        weatherSteps.enterCityToSearch(city);
+        weatherPage.enterCityToSearch(city);
     }
 
     @Then("Dropdown with suggestions appear")
     public void checkDropdownWithSuggestionsIsPresent() {
-        weatherSteps.checkDropdownWithSuggestionsIsPresent();
+        weatherPage.checkDropdownWithSuggestionsIsPresent();
     }
 
-    @When("{string} city is chosen")
+    @When("^\"(.+)\" city is chosen$")
     public void chooseRequiredCity(String city) {
-        weatherSteps.chooseCity(city);
+        weatherPage.chooseCity(city);
     }
 
-    @Then("Weather for the {string} city appear")
+    @Then("^Weather for the \"(.+)\" city appear$")
     public void checkForecast(String city) {
-        weatherSteps.checkWeatherForCityIsPresent(city);
+        weatherPage.checkWeatherIsPresentForChosenCity(city);
     }
+
+    @After()
+    public void closeBrowser() {
+        driver.quit();
+    }
+
 }

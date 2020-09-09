@@ -1,25 +1,33 @@
 package pageobjects;
 
-import net.serenitybdd.core.pages.PageObject;
-import net.serenitybdd.core.pages.WebElementFacade;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.openqa.selenium.By.name;
 import static org.openqa.selenium.Keys.ENTER;
+import static org.openqa.selenium.support.PageFactory.initElements;
 
-public class SearchPage extends PageObject {
+public class SearchPage {
 
-    @FindBy (xpath = "//span[text()='https://weather.com']")
-    private WebElementFacade weatherCom;
+    @FindBy (xpath = "//*[text()='The Weather Channel']")
+    private WebElement weatherCom;
+
+    private WebDriver driver;
 
     public SearchPage(WebDriver driver) {
-        super(driver);
+        this.driver = driver;
+        initElements(driver, this);
+    }
+
+    public void navigateToSearch(){
+        driver.get("https://www.google.com");
     }
 
     public void searchFor(String searchTerm) {
-        find(name("q")).sendKeys(searchTerm, ENTER);
+        driver.findElement(name("q")).sendKeys(searchTerm, ENTER);
 
     }
 
@@ -29,6 +37,6 @@ public class SearchPage extends PageObject {
 
 
     public void isBrowserOpened() {
-        assertEquals(getDriver().getCurrentUrl(), "https://www.google.com");
+        assertEquals(driver.getCurrentUrl(), "https://www.google.com");
     }
 }
